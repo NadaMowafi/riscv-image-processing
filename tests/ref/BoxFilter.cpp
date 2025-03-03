@@ -2,11 +2,20 @@
 #include "FFT.h"
 #include "Complex.h"
 #include <vector>
+#include <iostream>
 
 std::vector<std::vector<double>> BoxFilter::applyBoxFilterFFT(
     const std::vector<std::vector<double>>& image, int kernelSize) {
+    if (image.empty() || image[0].empty()) {
+        throw std::invalid_argument("Image is empty");
+    }
+
     int originalRows = image.size();
     int originalCols = image[0].size();
+    if (kernelSize >= originalRows || kernelSize >= originalCols || kernelSize % 2 == 0) {
+        throw std::invalid_argument("Invalid kernel size");
+    }
+
     std::vector<std::vector<double>> paddedImage = FFT::zeroPad(image);
     int rows = paddedImage.size();
     int cols = paddedImage[0].size();
@@ -43,5 +52,15 @@ std::vector<std::vector<double>> BoxFilter::applyBoxFilterFFT(
             paddedResult[i][j] = resultComplex[i][j].real;
         }
     }
+
+    // Debugging: Print intermediate results
+    std::cout << "Padded Result:" << std::endl;
+    for (const auto& row : paddedResult) {
+        for (const auto& val : row) {
+            std::cout << val << " ";
+        }
+        std::cout << std::endl;
+    }
+
     return FFT::extractOriginalSize(paddedResult, originalRows, originalCols);
 }

@@ -57,9 +57,7 @@ void FFT::fft2D(vector<vector<Complex>>& image, bool inverse) {
     }
 }
 
-vector<vector<double>> extractOriginalSize(
-    const vector<vector<double>>& paddedResult,
-    int originalRows, int originalCols) {
+vector<vector<double>> FFT::extractOriginalSize(const vector<vector<double>>& paddedResult,int originalRows, int originalCols) {
     
     vector<vector<double>> result(originalRows, vector<double>(originalCols, 0.0));
     
@@ -72,7 +70,7 @@ vector<vector<double>> extractOriginalSize(
     return result;
 }
 
-vector<vector<double>> zeroPad(const vector<vector<double>>& image) {
+vector<vector<double>> FFT::zeroPad(const vector<vector<double>>& image) {
     int rows = image.size();
     int cols = image[0].size();
     

@@ -6,7 +6,9 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}",
                 "${workspaceFolder}/models",
-                "${workspaceFolder}/utils"
+                "${workspaceFolder}/utils",
+                "/opt/homebrew/include",
+                "/opt/homebrew/opt/googletest/include"
             ],
             "defines": [],
             "macFrameworkPath": [

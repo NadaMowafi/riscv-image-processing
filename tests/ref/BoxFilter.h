@@ -6,7 +6,9 @@
 #include <cmath>
 #include "FFT.h"
 #include "Complex.h"
+
 class BoxFilter {
+    public:
     std::vector<std::vector<double>> applyBoxFilterFFT(
         const std::vector<std::vector<double>>& image, int kernelSize);
 };
