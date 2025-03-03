@@ -9,17 +9,17 @@
 enum class ImageStatus {
     SUCCESS,
     FILE_NOT_FOUND,
-    INVALID_FORMAT,
     READ_ERROR,
-    WRITE_ERROR,
-    PARSE_ERROR
+    PARSE_ERROR,
+    UNSUPPORTED_FORMAT
 };
 
 enum class ImageFormat {
     UNKNOWN,
     PGM,
     PNG,
-    JPEG
+    JPEG,
+    BMP
 };
 
 struct ImageMetadata {
