@@ -6,26 +6,41 @@ using namespace std;
 void FFT::fft(vector<Complex>& x, bool inverse) {
     size_t n = x.size();
     if (n <= 1) return;
-    
-    vector<Complex> even(n / 2), odd(n / 2);
-    for (size_t i = 0; i < n / 2; i++) {
-        even[i] = x[i * 2];
-        odd[i] = x[i * 2 + 1];
+
+    // Rearrange input into bit-reversed order
+    size_t j = 0;
+    for (size_t i = 1; i < n; i++) {
+        size_t bit = n >> 1;
+        while (j >= bit) {
+            j -= bit;
+            bit >>= 1;
+        }
+        j += bit;
+        if (i < j) swap(x[i], x[j]); // Swap only if needed
     }
-    fft(even, inverse);
-    fft(odd, inverse);
-    double angleFactor = 2.0 * M_PI / n * (inverse ? -1.0 : 1.0);
-    Complex w(1.0, 0.0);
-    Complex wn(cos(angleFactor), sin(angleFactor));
-    for (size_t k = 0; k < n / 2; k++) {
-        Complex t = w * odd[k];
-        x[k] = even[k] + t;
-        x[k + n / 2] = even[k] - t;
-        w = w * wn;
+
+    // Iterative FFT using the Cooley-Tukey algorithm
+    for (size_t len = 2; len <= n; len *= 2) {
+        double angle = 2 * M_PI / len * (inverse ? -1 : 1);
+        Complex wn(cos(angle), sin(angle)); // Twiddle factor
+        for (size_t i = 0; i < n; i += len) {
+            Complex w(1, 0);
+            for (size_t j = 0; j < len / 2; j++) {
+                Complex t = w * x[i + j + len / 2];
+                Complex u = x[i + j];
+
+                x[i + j] = u + t;
+                x[i + j + len / 2] = u - t;
+
+                w = w * wn; // Update twiddle factor
+            }
+        }
     }
+
+    // Scale for inverse FFT
     if (inverse) {
         for (size_t i = 0; i < n; i++) {
-            x[i] *= 1.0 / n;
+            x[i] *= (1.0 / n);
         }
     }
 }

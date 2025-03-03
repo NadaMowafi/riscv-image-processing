@@ -76,3 +76,8 @@ double Complex::magnitude() const {
 Complex Complex::conjugate() const {
     return Complex(real, -imag);
 }
+
+std::ostream& operator<<(std::ostream& os, const Complex& c) {
+    os << c.real << " + " << c.imag << "i";
+    return os;
+}

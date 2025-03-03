@@ -31,7 +31,6 @@ public:
     Complex conjugate() const;
 
     friend ostream& operator<<(std::ostream& os, const Complex& c);
-    friend istream& operator>>(std::istream& is, Complex& c);
 };
 
 #endif // COMPLEX_H

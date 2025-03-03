@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}",
-                "${workspaceFolder}/models"
+                "${workspaceFolder}/models",
+                "${workspaceFolder}/utils"
             ],
             "defines": [],
             "macFrameworkPath": [
