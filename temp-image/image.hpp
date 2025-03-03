@@ -23,10 +23,10 @@ enum class ImageFormat {
 };
 
 struct ImageMetadata {
-    std::string format;
-    uint32_t width;
-    uint32_t height;
-    uint16_t maxValue;
+    ImageFormat format = ImageFormat::UNKNOWN;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint32_t maxValue = 0;
 };
 
 struct Image {
