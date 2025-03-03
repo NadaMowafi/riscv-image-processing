@@ -15,6 +15,13 @@ enum class ImageStatus {
     PARSE_ERROR
 };
 
+enum class ImageFormat {
+    UNKNOWN,
+    PGM,
+    PNG,
+    JPEG
+};
+
 struct ImageMetadata {
     std::string format;
     uint32_t width;
