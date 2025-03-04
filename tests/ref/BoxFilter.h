@@ -12,6 +12,6 @@ using namespace std;
  * @param outputImg: Output image as a 3D vector of pixel values.
  * @param kernelSize: Size of the kernel .
  */
-void BoxFilter(const std::vector<std::vector<std::vector<int>>>& inputImg, std::vector<std::vector<std::vector<int>>>& outputImg, int kernelSize);
+vector<vector<vector<int>>> BoxFilter(const vector<vector<vector<int>>> &inputImg, int kernelSize);
 
 #endif // BOXFILTER_H
