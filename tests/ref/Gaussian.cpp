@@ -1,0 +1,157 @@
+#include "Gaussian.hpp" 
+#include <vector>
+#include <cmath>
+
+//--------------------------------------------------
+// 2D Gaussian Kernel (integrated version)
+//--------------------------------------------------
+std::vector<std::vector<double>> generateGaussianKernel(int kernelSize, double sigma) {
+    std::vector<std::vector<double>> kernel(kernelSize, std::vector<double>(kernelSize, 0));
+    double sum = 0.0;
+    int half = kernelSize / 2;
+    double twoSigmaSquare = 2 * sigma * sigma;
+    double constant = 1.0 / (2 * M_PI * sigma * sigma);
+    double step = 0.001; // integration increment
+
+    // Loop over each pixel in the kernel
+    for (int i = -half; i <= half; i++) {
+        for (int j = -half; j <= half; j++) {
+            double integratedValue = 0.0;
+            // Integrate over the pixel area from (i - 0.5) to (i + 0.5) and (j - 0.5) to (j + 0.5)
+            for (double x = i - 0.5; x < i + 0.5; x += step) {
+                for (double y = j - 0.5; y < j + 0.5; y += step) {
+                    integratedValue += constant * std::exp(-(x * x + y * y) / twoSigmaSquare) * step * step;
+                }
+            }
+            kernel[i + half][j + half] = integratedValue;
+            sum += integratedValue;
+        }
+    }
+    // Normalize the kernel so that the sum of all elements is 1
+    for (int i = 0; i < kernelSize; i++) {
+        for (int j = 0; j < kernelSize; j++) {
+            kernel[i][j] /= sum;
+        }
+    }
+    return kernel;
+}
+
+//--------------------------------------------------
+// 1D Gaussian Kernel (for separable convolution)
+//--------------------------------------------------
+std::vector<double> generateGaussianKernel1D(int kernelSize, double sigma) {
+    int half = kernelSize / 2;
+    std::vector<double> kernel(kernelSize, 0.0);
+    double sum = 0.0;
+    double twoSigmaSquare = 2 * sigma * sigma;
+    double constant = 1.0 / (std::sqrt(2 * M_PI) * sigma);
+
+    for (int i = -half; i <= half; i++) {
+        double value = constant * std::exp(-(i * i) / twoSigmaSquare);
+        kernel[i + half] = value;
+        sum += value;
+    }
+    // Normalize the kernel
+    for (int i = 0; i < kernelSize; i++) {
+        kernel[i] /= sum;
+    }
+    return kernel;
+}
+
+//--------------------------------------------------
+// Zero padding for int images with a given pad size
+//--------------------------------------------------
+std::vector<std::vector<int>> zeroPad(const std::vector<std::vector<int>>& image, int pad) {
+    int rows = image.size();
+    int cols = image[0].size();
+    int paddedRows = rows + 2 * pad;
+    int paddedCols = cols + 2 * pad;
+    
+    std::vector<std::vector<int>> padded(paddedRows, std::vector<int>(paddedCols, 0));
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            padded[i + pad][j + pad] = image[i][j];
+        }
+    }
+    return padded;
+}
+
+//--------------------------------------------------
+// 2D convolution version (SHOULDN'T BE USED!!)
+//--------------------------------------------------
+std::vector<std::vector<int>> applyGaussianFilter(
+    const std::vector<std::vector<int>>& image,
+    const std::vector<std::vector<double>>& kernel) {
+
+    int height = image.size();
+    int width = image[0].size();
+    int kSize = kernel.size();
+    int half = kSize / 2;
+
+    // Pad the image with 'half' pixels on each side
+    std::vector<std::vector<int>> paddedImage = zeroPad(image, half);
+    
+    // Create an output image with the same dimensions as the original image
+    std::vector<std::vector<int>> output(height, std::vector<int>(width, 0));
+
+    // Perform convolution on the padded image
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double sum = 0.0;
+            for (int m = 0; m < kSize; m++) {
+                for (int n = 0; n < kSize; n++) {
+                    sum += paddedImage[i + m][j + n] * kernel[m][n];
+                }
+            }
+            output[i][j] = static_cast<int>(sum);
+        }
+    }
+    return output;
+}
+
+//--------------------------------------------------
+// Separable convolution version (optimized) using the fact that Gaussian kernel is separable
+//--------------------------------------------------
+std::vector<std::vector<int>> applyGaussianFilterSeparable(
+    const std::vector<std::vector<int>>& image,
+    int kernelSize,
+    double sigma) {
+
+    int height = image.size();
+    int width = image[0].size();
+    int half = kernelSize / 2;
+
+    // Generate the 1D Gaussian kernel
+    std::vector<double> kernel1D = generateGaussianKernel1D(kernelSize, sigma);
+
+    // First pass: horizontal convolution.
+    std::vector<std::vector<double>> intermediate(height, std::vector<double>(width, 0.0));
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double sum = 0.0;
+            for (int k = -half; k <= half; k++) {
+                int col = j + k;
+                // Zero padding: if the index is out-of-bounds, assume 0.
+                if (col < 0 || col >= width) continue;
+                sum += image[i][col] * kernel1D[k + half];
+            }
+            intermediate[i][j] = sum;
+        }
+    }
+
+    // Second pass: vertical convolution.
+    std::vector<std::vector<int>> output(height, std::vector<int>(width, 0));
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double sum = 0.0;
+            for (int k = -half; k <= half; k++) {
+                int row = i + k;
+                // Zero padding: if the index is out-of-bounds, assume 0.
+                if (row < 0 || row >= height) continue;
+                sum += intermediate[row][j] * kernel1D[k + half];
+            }
+            output[i][j] = static_cast<int>(sum);
+        }
+    }
+    return output;
+}
