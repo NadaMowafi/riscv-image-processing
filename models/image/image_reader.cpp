@@ -52,15 +52,35 @@ ImageFormat ImageReader::detectFormat(const std::vector<uint8_t>& rawData) {
 ImageStatus ImageReader::parseMetadata(const std::vector<uint8_t>&, ImageMetadata&) {
     return ImageStatus::SUCCESS; // Reserved for shared metadata logic if needed.
 }
+
 ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& image) {
     std::istringstream stream(std::string(rawData.begin(), rawData.end()));
+    std::string line;
     std::string magicNumber;
-    uint32_t width, height, maxValue;
+    uint32_t width = 0, height = 0, maxValue = 0;
 
-    stream >> magicNumber >> width >> height >> maxValue;
-    stream.ignore(1); // Skip whitespace
+    // Read magic number
+    std::getline(stream, line);
+    if (line != "P5") {
+        return ImageStatus::PARSE_ERROR;
+    }
+    magicNumber = line;
 
-    if (magicNumber != "P5") {
+    // Read width, height, and maxValue while skipping comments
+    while (std::getline(stream, line)) {
+        if (line.empty() || line[0] == '#') continue;
+        std::istringstream dimensions(line);
+        dimensions >> width >> height;
+        if (width > 0 && height > 0) break;
+    }
+    while (std::getline(stream, line)) {
+        if (line.empty() || line[0] == '#') continue;
+        std::istringstream maxValStream(line);
+        maxValStream >> maxValue;
+        if (maxValue > 0) break;
+    }
+
+    if (width == 0 || height == 0 || maxValue == 0) {
         return ImageStatus::PARSE_ERROR;
     }
 
@@ -68,10 +88,19 @@ ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& im
     image.metadata.height = height;
     image.metadata.maxValue = maxValue;
 
+    // Get position of pixel data after header
     size_t headerSize = stream.tellg();
-    image.pixelData.assign(rawData.begin() + headerSize, rawData.end());
+    if (headerSize == -1) {
+        return ImageStatus::PARSE_ERROR;
+    }
 
-    // Convert to 2D vector
+    if (rawData.size() < headerSize + width * height) {
+        return ImageStatus::FILE_READ_ERROR;
+    }
+
+    image.pixelData.assign(rawData.begin() + headerSize, rawData.begin() + headerSize + width * height);
+
+    // Fill pixelMatrix
     image.pixelMatrix.resize(height, std::vector<uint8_t>(width));
     for (uint32_t i = 0; i < height; ++i) {
         for (uint32_t j = 0; j < width; ++j) {
