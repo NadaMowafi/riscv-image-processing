@@ -23,8 +23,10 @@ struct ImageMetadata {
 
 struct Image {
     ImageMetadata metadata;
-    std::vector<uint8_t> pixelData;
+    std::vector<uint8_t> pixelData; // Flat array (if you just want the matrix)
+    std::vector<std::vector<uint8_t>> pixelMatrix; // 2D pixel array
 };
+
 
 ImageStatus validateImage(const Image& image);
 

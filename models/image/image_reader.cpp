@@ -52,7 +52,6 @@ ImageFormat ImageReader::detectFormat(const std::vector<uint8_t>& rawData) {
 ImageStatus ImageReader::parseMetadata(const std::vector<uint8_t>&, ImageMetadata&) {
     return ImageStatus::SUCCESS; // Reserved for shared metadata logic if needed.
 }
-
 ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& image) {
     std::istringstream stream(std::string(rawData.begin(), rawData.end()));
     std::string magicNumber;
@@ -71,6 +70,14 @@ ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& im
 
     size_t headerSize = stream.tellg();
     image.pixelData.assign(rawData.begin() + headerSize, rawData.end());
+
+    // Convert to 2D vector
+    image.pixelMatrix.resize(height, std::vector<uint8_t>(width));
+    for (uint32_t i = 0; i < height; ++i) {
+        for (uint32_t j = 0; j < width; ++j) {
+            image.pixelMatrix[i][j] = image.pixelData[i * width + j];
+        }
+    }
 
     return ImageStatus::SUCCESS;
 }
