@@ -4,15 +4,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
-
-// Here we can put the enums that mazen told us about ....
-enum class ImageStatus {
-    SUCCESS,
-    FILE_NOT_FOUND,
-    READ_ERROR,
-    PARSE_ERROR,
-    UNSUPPORTED_FORMAT
-};
+#include "../../utils/image_status.h"
 
 enum class ImageFormat {
     UNKNOWN,

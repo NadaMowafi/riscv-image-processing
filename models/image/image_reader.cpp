@@ -1,4 +1,4 @@
-#include "imageReader.hpp"
+#include "image_reader.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -14,7 +14,7 @@ ImageStatus ImageReader::readImage(const std::string& filePath, Image& image) {
     file.close();
 
     if (rawData.empty()) {
-        return ImageStatus::READ_ERROR;
+        return ImageStatus::FILE_READ_ERROR;
     }
 
     image.metadata.format = detectFormat(rawData);
