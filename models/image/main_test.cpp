@@ -7,7 +7,7 @@ int main() {
     ImageWriter writer;
     Image image;
 
-    ImageStatus status = reader.readImage("3things.256.pgm", image);
+    ImageStatus status = reader.readImage("barb.512 (1).pgm", image);
     if (status != ImageStatus::SUCCESS) {
         std::cerr << "Failed to read image: " << static_cast<int>(status) << std::endl;
         return 1;
@@ -16,6 +16,16 @@ int main() {
     std::cout << "Image read successfully. Size: "
               << image.metadata.width << "x"
               << image.metadata.height << std::endl;
+
+    // // Print the 2D pixel matrix
+    // std::cout << "2D Pixel Matrix:" << std::endl;
+    // for (const auto &row : image.pixelMatrix) {
+    //     std::cout << "[ ";
+    //     for (const auto &pixel : row) {
+    //         std::cout << static_cast<int>(pixel) << " ";
+    //     }
+    //     std::cout << "]" << std::endl;
+    // }
 
     status = writer.writeImage("output.pgm", image);
     if (status != ImageStatus::SUCCESS) {
