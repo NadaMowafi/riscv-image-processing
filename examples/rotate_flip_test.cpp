@@ -1,16 +1,18 @@
 #include "image_reader.hpp"
 #include "image_writer.hpp"
 #include "../tests/ref/include/rotate.h"
+#include "../tests/ref/include/Flipping.hpp"
 #include <iostream>
 
 int main() {
     ImageReader reader;
     ImageWriter writer;
     ImageRotator rotator;
+    ImageFlipper flipper;
     Image image;
 
     // Read the image
-    ImageStatus status = reader.readImage("barb.512 (1).pgm", image);
+    ImageStatus status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         std::cerr << "Failed to read image: " << static_cast<int>(status) << std::endl;
         return 1;
@@ -46,6 +48,28 @@ int main() {
     //     return 1;
     // }
     // std::cout << "180-degree rotated image written successfully." << std::endl;
+
+    //---------------------------------------FLIPPING----------------------------------------------
+    // Read the image
+    ImageStatus status = reader.readImage("barb.512.pgm", image);
+    if (status != ImageStatus::SUCCESS) {
+        std::cerr << "Failed to read image: " << static_cast<int>(status) << std::endl;
+        return 1;
+    }
+
+    std::cout << "Image read successfully. Size: "
+              << image.metadata.width << "x"
+              << image.metadata.height << std::endl;
+
+    // flipper.flip(image, FlippingDirection::VERTICAL);
+    flipper.flip(image, FlippingDirection::HORIZONTAL);
+    status = writer.writeImage("Flipped_Vertical.pgm", image);
+    if (status != ImageStatus::SUCCESS) {
+        std::cerr << "Failed to write image: " << static_cast<int>(status) << std::endl;
+        return 1;
+    }
+    std::cout << "Horizontal flipped image written successfully." << std::endl;
+
 
     return 0;
 }
