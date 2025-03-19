@@ -1,7 +1,5 @@
 add_library(models STATIC 
             complex.cpp
-            image_reader.cpp
-            image_writer.cpp
             image.cpp
             )
             

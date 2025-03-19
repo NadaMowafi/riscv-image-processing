@@ -65,13 +65,13 @@ vector<vector<uint8_t>> BoxFilter::applyBoxFilterFFT(
     }
 
     // Debugging: Print intermediate results
-    cout << "Padded Result:" << endl;
-    for (const auto& row : paddedResult) {
-        for (const auto& val : row) {
-            cout << val << " ";
-        }
-        cout << endl;
-    }
+    // cout << "Padded Result:" << endl;
+    // for (const auto& row : paddedResult) {
+    //     for (const auto& val : row) {
+    //         cout << val << " ";
+    //     }
+    //     cout << endl;
+    // }
 
     return FFT::extractOriginalSize(paddedResult, originalRows, originalCols);
 }
