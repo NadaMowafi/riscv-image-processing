@@ -1,8 +1,8 @@
-#ifndef FFT_H
-#define FFT_H
+#ifndef FFT_HPP
+#define FFT_HPP
 
 #include <vector>
-#include "Complex.h"
+#include "Complex.hpp"
 #include <cstdint>
 
 using namespace std;
@@ -15,4 +15,4 @@ public:
     static vector<vector<uint8_t>> extractOriginalSize(const vector<vector<double>>& paddedResult,int originalRows, int originalCols);
 };
 
-#endif // FFT_H
+#endif // FFT_HPP

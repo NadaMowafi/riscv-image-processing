@@ -3,7 +3,7 @@
 
 ImageWriter::ImageWriter() {}
 
-ImageStatus ImageWriter::writeImage(const std::string& filePath, const Image& image) {
+ImageStatus ImageWriter::writeImage(const string& filePath, const Image& image) {
     switch (image.metadata.format) {
         case ImageFormat::PGM:
             return writePGM(filePath, image);
@@ -18,8 +18,8 @@ ImageStatus ImageWriter::writeImage(const std::string& filePath, const Image& im
     }
 }
 
-ImageStatus ImageWriter::writePGM(const std::string& filePath, const Image& image) {
-    std::ofstream file(filePath, std::ios::binary);
+ImageStatus ImageWriter::writePGM(const string& filePath, const Image& image) {
+    ofstream file(filePath, ios::binary);
     if (!file.is_open()) {
         return ImageStatus::FILE_WRITE_ERROR;
     }
@@ -42,14 +42,14 @@ ImageStatus ImageWriter::writePGM(const std::string& filePath, const Image& imag
     return ImageStatus::SUCCESS;
 }
 
-ImageStatus ImageWriter::writePNG(const std::string&, const Image&) {
+ImageStatus ImageWriter::writePNG(const string&, const Image&) {
     return ImageStatus::UNSUPPORTED_FORMAT; // To be implemented later
 }
 
-ImageStatus ImageWriter::writeJPEG(const std::string&, const Image&) {
+ImageStatus ImageWriter::writeJPEG(const string&, const Image&) {
     return ImageStatus::UNSUPPORTED_FORMAT; // To be implemented later
 }
 
-ImageStatus ImageWriter::writeBMP(const std::string&, const Image&) {
+ImageStatus ImageWriter::writeBMP(const string&, const Image&) {
     return ImageStatus::UNSUPPORTED_FORMAT; // To be implemented later
 }

@@ -1,6 +1,6 @@
 // ImageStatus.h
-#ifndef IMAGESTATUS_H
-#define IMAGESTATUS_H
+#ifndef IMAGESTATUS_HPP
+#define IMAGESTATUS_HPP
 
 enum class ImageStatus
 {
@@ -30,4 +30,4 @@ enum class ImageStatus
   UNKNOWN_ERROR = 999
 };
 
-#endif // IMAGESTATUS_H
+#endif // IMAGESTATUS_HPP

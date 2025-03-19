@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "BoxFilter.h"
-#include "FFT.h"
+#include "BoxFilter.hpp"
+#include "FFT.hpp"
 #include <vector>
 #include <stdexcept>
 #include <cstdint>
@@ -26,7 +26,7 @@ TEST(BoxFilterTest, ApplyBoxFilterSuccess) {
     };
     BoxFilter boxFilter;
     int kernelSize = 3;
-    std::vector<std::vector<uint8_t>> result = boxFilter.applyBoxFilterFFT(image, kernelSize);     
+    vector<vector<uint8_t>> result = boxFilter.applyBoxFilterFFT(image, kernelSize);     
         ASSERT_FALSE(result.empty());
         ASSERT_EQ(result.size(), image.size());
         ASSERT_EQ(result[0].size(), image[0].size());
@@ -35,7 +35,7 @@ TEST(BoxFilterTest, ApplyBoxFilterSuccess) {
 }
 
 TEST(BoxFilterTest, ApplyBoxFilterInvalidKernel) {
-    std::vector<std::vector<uint8_t>> image = {
+    vector<vector<uint8_t>> image = {
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9}
@@ -45,28 +45,28 @@ TEST(BoxFilterTest, ApplyBoxFilterInvalidKernel) {
 
     try {
         BoxFilter boxFilter;
-        std::vector<std::vector<uint8_t>> result = boxFilter.applyBoxFilterFFT(image, kernelSize);
+        vector<vector<uint8_t>> result = boxFilter.applyBoxFilterFFT(image, kernelSize);
         FAIL() << "Expected an exception due to invalid kernel size.";
-    } catch (const std::exception& e) {
+    } catch (const exception& e) {
         EXPECT_STREQ(e.what(), "Invalid kernel size");
     } catch (...) {
-        FAIL() << "Expected std::exception.";
+        FAIL() << "Expected exception.";
     }
 }
 
 TEST(BoxFilterTest, ApplyBoxFilterEmptyImage) {
-    std::vector<std::vector<uint8_t>> image;
+    vector<vector<uint8_t>> image;
 
     int kernelSize = 3;
 
     try {
         BoxFilter boxFilter;
-        std::vector<std::vector<uint8_t>> result = boxFilter.applyBoxFilterFFT(image, kernelSize);
+        vector<vector<uint8_t>> result = boxFilter.applyBoxFilterFFT(image, kernelSize);
         FAIL() << "Expected an exception due to empty image.";
-    } catch (const std::exception& e) {
+    } catch (const exception& e) {
         EXPECT_STREQ(e.what(), "Image is empty");
     } catch (...) {
-        FAIL() << "Expected std::exception.";
+        FAIL() << "Expected exception.";
     }
 }
 

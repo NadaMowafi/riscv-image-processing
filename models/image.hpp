@@ -4,7 +4,8 @@
 #include <vector>
 #include <string>
 #include <cstdint>
-#include "image_status.h"
+#include "image_status.hpp"
+using namespace std;
 
 enum class ImageFormat {
     UNKNOWN,
@@ -23,8 +24,8 @@ struct ImageMetadata {
 
 struct Image {
     ImageMetadata metadata;
-    std::vector<uint8_t> pixelData; // Flat array (if you just want the matrix)
-    std::vector<std::vector<uint8_t>> pixelMatrix; // 2D pixel array
+    vector<uint8_t> pixelData; // Flat array (if you just want the matrix)
+    vector<vector<uint8_t>> pixelMatrix; // 2D pixel array
 };
 
 
