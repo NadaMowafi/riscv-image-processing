@@ -1,5 +1,7 @@
 #include "image_reader.hpp"
 #include "image_writer.hpp"
+#include "rotate.hpp"
+#include "Flipping.hpp"
 #include "BoxFilter.hpp"
 #include "Gaussian.hpp"
 #include "FFT.hpp"
@@ -12,23 +14,24 @@ using namespace std;
 int main() {
     ImageReader reader;
     ImageWriter writer;
+    ImageRotator rotator;
+    ImageFlipper flipper;
+    BoxFilter boxFilter;
     Image image;
-    BoxFilter BoxFilter;
     int kernelSize = 5;
-    // -------------------Apply BoxFilter FFT----------------------- 
+    double sigma = 3;
+
+    // Read the image
     ImageStatus status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         cerr << "Failed to read image: " << static_cast<int>(status) << endl;
         return 1;
     }
-    cout << "Image read successfully. Size: "
-              << image.metadata.width << "x"
-              << image.metadata.height << endl;
+    cout << "Image read successfully. Size: " << image.metadata.width << "x" << image.metadata.height << endl;
 
-    
-    vector<vector<uint8_t>> filteredMatrix = BoxFilter.applyBoxFilterFFT(image.pixelMatrix, kernelSize);
-    image.pixelMatrix = filteredMatrix;
-    
+    // ------------------- Apply BoxFilter FFT ----------------------- 
+    vector<vector<uint8_t>> filteredMatrixFFT = boxFilter.applyBoxFilterFFT(image.pixelMatrix, kernelSize);
+    image.pixelMatrix = filteredMatrixFFT;
     status = writer.writeImage("barb.512blur_fft.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         cerr << "Failed to write FFT filtered image: " << static_cast<int>(status) << endl;
@@ -36,43 +39,67 @@ int main() {
     }
     cout << "FFT Filtered image written successfully." << endl;
 
-    // -------------------Apply BoxFilter Sliding-----------------------
+    // ------------------- Apply BoxFilter Sliding -----------------------
     status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         cerr << "Failed to read image: " << static_cast<int>(status) << endl;
         return 1;
     }
-    
-    vector<vector<uint8_t>> filteredMatrixSliding = BoxFilter.applyBoxFilterSlidingGrey(image.pixelMatrix, kernelSize);
+    vector<vector<uint8_t>> filteredMatrixSliding = boxFilter.applyBoxFilterSlidingGrey(image.pixelMatrix, kernelSize);
     image.pixelMatrix = filteredMatrixSliding;
-
     status = writer.writeImage("barb.512blur_sliding.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         cerr << "Failed to write Sliding Window filtered image: " << static_cast<int>(status) << endl;
         return 1;
     }
-
     cout << "Sliding Window filtered image written successfully." << endl;
 
-    // -------------------Apply Gaussian Filter-----------------------
+    // ------------------- Apply Gaussian Filter -----------------------
     status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         cerr << "Failed to read image: " << static_cast<int>(status) << endl;
         return 1;
     }
-    double sigma = 3;
     vector<vector<double>> gaussianKernel = generateGaussianKernel(kernelSize, sigma);
     vector<vector<uint8_t>> filteredMatrixGaussian = applyGaussianFilter(image.pixelMatrix, gaussianKernel);
-
     image.pixelMatrix = filteredMatrixGaussian;
-
     status = writer.writeImage("barb.512blur_gaussian.pgm", image);
     if (status != ImageStatus::SUCCESS) {
         cerr << "Failed to write Gaussian filtered image: " << static_cast<int>(status) << endl;
         return 1;
     }
-
     cout << "Gaussian filtered image written successfully." << endl;
+
+    // ------------------- Rotation & Flipping -----------------------
+    status = reader.readImage("barb.512.pgm", image);
+    if (status != ImageStatus::SUCCESS) {
+        cerr << "Failed to read image: " << static_cast<int>(status) << endl;
+        return 1;
+    }
+    cout << "Processing image rotation and flipping..." << endl;
+
+    // Rotate 90 degrees CCW
+    rotator.rotate(image, RotationDirection::CCW_90);
+    status = writer.writeImage("output_90CCW.pgm", image);
+    if (status != ImageStatus::SUCCESS) {
+        cerr << "Failed to write 90CCW image: " << static_cast<int>(status) << endl;
+        return 1;
+    }
+    cout << "90-degree CCW rotated image written successfully." << endl;
+
+    // Flip Horizontally
+    status = reader.readImage("barb.512.pgm", image);
+    if (status != ImageStatus::SUCCESS) {
+        cerr << "Failed to read image: " << static_cast<int>(status) << endl;
+        return 1;
+    }
+    flipper.flip(image, FlippingDirection::HORIZONTAL);
+    status = writer.writeImage("Flipped_Horizontal.pgm", image);
+    if (status != ImageStatus::SUCCESS) {
+        cerr << "Failed to write flipped image: " << static_cast<int>(status) << endl;
+        return 1;
+    }
+    cout << "Horizontal flipped image written successfully." << endl;
 
     return 0;
 }
