@@ -3,6 +3,7 @@ add_library(tests STATIC
             ref/src/Gaussian.cpp  
             ref/src/rotate.cpp 
             ref/src/Flipping.cpp
+            ref/src/BilateralFilter.cpp
             )
 
 target_include_directories(tests
