@@ -1,36 +1,36 @@
-#include "BoxFilter.h"
-#include "FFT.h"
-#include "Complex.h"
+#include "BoxFilter.hpp"
+#include "FFT.hpp"
+#include "Complex.hpp"
 #include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <cstdint>
 #include <cmath> 
 
-using namespace std;
 
-std::vector<std::vector<uint8_t>> BoxFilter::applyBoxFilterFFT(
-    const std::vector<std::vector<uint8_t>>& image, int kernelSize) {
+
+vector<vector<uint8_t>> BoxFilter::applyBoxFilterFFT(
+    const vector<vector<uint8_t>>& image, int kernelSize) {
     if (image.empty() || image[0].empty()) {
-        throw std::invalid_argument("Image is empty");
+        throw invalid_argument("Image is empty");
     }
 
     int originalRows = image.size();
     int originalCols = image[0].size();
     if (kernelSize > originalRows || kernelSize > originalCols || kernelSize % 2 == 0) {
-        throw std::invalid_argument("Invalid kernel size");
+        throw invalid_argument("Invalid kernel size");
     }
-    std::vector<std::vector<double>> doubleImage(originalRows, std::vector<double>(originalCols, 0.0));
+    vector<vector<double>> doubleImage(originalRows, vector<double>(originalCols, 0.0));
     for (int i = 0; i < originalRows; i++) {
         for (int j = 0; j < originalCols; j++) {
             doubleImage[i][j] = static_cast<double>(image[i][j]);
         }
     }
 
-    std::vector<std::vector<double>> paddedImage = FFT::zeroPad(doubleImage);
+    vector<vector<double>> paddedImage = FFT::zeroPad(doubleImage);
     int rows = paddedImage.size();
     int cols = paddedImage[0].size();
-    std::vector<std::vector<double>> kernel(rows, std::vector<double>(cols, 0.0));
+    vector<vector<double>> kernel(rows, vector<double>(cols, 0.0));
     double normFactor = 1.0 / (kernelSize * kernelSize);
     int halfKernel = kernelSize / 2;
     for (int i = 0; i < kernelSize; i++) {
@@ -40,8 +40,8 @@ std::vector<std::vector<uint8_t>> BoxFilter::applyBoxFilterFFT(
             kernel[y][x] = normFactor;
         }
     }
-    std::vector<std::vector<Complex>> imageComplex(rows, std::vector<Complex>(cols));
-    std::vector<std::vector<Complex>> kernelComplex(rows, std::vector<Complex>(cols));
+    vector<vector<Complex>> imageComplex(rows, vector<Complex>(cols));
+    vector<vector<Complex>> kernelComplex(rows, vector<Complex>(cols));
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             imageComplex[i][j] = Complex(paddedImage[i][j], 0.0);
@@ -50,14 +50,14 @@ std::vector<std::vector<uint8_t>> BoxFilter::applyBoxFilterFFT(
     }
     FFT::fft2D(imageComplex, false);
     FFT::fft2D(kernelComplex, false);
-    std::vector<std::vector<Complex>> resultComplex(rows, std::vector<Complex>(cols));
+    vector<vector<Complex>> resultComplex(rows, vector<Complex>(cols));
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             resultComplex[i][j] = imageComplex[i][j] * kernelComplex[i][j];
         }
     }
     FFT::fft2D(resultComplex, true);
-    std::vector<std::vector<double>> paddedResult(rows, std::vector<double>(cols));
+    vector<vector<double>> paddedResult(rows, vector<double>(cols));
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             paddedResult[i][j] = resultComplex[i][j].real;
@@ -65,21 +65,21 @@ std::vector<std::vector<uint8_t>> BoxFilter::applyBoxFilterFFT(
     }
 
     // Debugging: Print intermediate results
-    std::cout << "Padded Result:" << std::endl;
-    for (const auto& row : paddedResult) {
-        for (const auto& val : row) {
-            std::cout << val << " ";
-        }
-        std::cout << std::endl;
-    }
+    // cout << "Padded Result:" << endl;
+    // for (const auto& row : paddedResult) {
+    //     for (const auto& val : row) {
+    //         cout << val << " ";
+    //     }
+    //     cout << endl;
+    // }
 
     return FFT::extractOriginalSize(paddedResult, originalRows, originalCols);
 }
 
 vector<vector<uint8_t>> BoxFilter::applyBoxFilterSlidingGrey(
-    const std::vector<std::vector<uint8_t>>& inputImg, int kernelSize) {
+    const vector<vector<uint8_t>>& inputImg, int kernelSize) {
         if (inputImg.empty() || inputImg[0].empty()) {
-            throw std::invalid_argument("Image is empty");
+            throw invalid_argument("Image is empty");
         }
     
         vector<vector<uint8_t>> outputImg;
@@ -88,7 +88,7 @@ vector<vector<uint8_t>> BoxFilter::applyBoxFilterSlidingGrey(
         int border = kernelSize / 2; // Border size for padding to handle edges
           // Check if kernel size is greater than image dimensions
           if (kernelSize > rows || kernelSize > cols || kernelSize % 2 == 0) {
-            throw std::invalid_argument("Invalid kernel size");
+            throw invalid_argument("Invalid kernel size");
         }
     
         // Initialize the output image with the same size as the input
@@ -132,7 +132,7 @@ vector<vector<uint8_t>> BoxFilter::applyBoxFilterSlidingGrey(
 vector<vector<vector<uint8_t>>> BoxFilter::applyBoxFilterSlidingRGB(
     const vector<vector<vector<uint8_t>>>& inputImg, int kernelSize) {
         if (inputImg.empty() || inputImg[0].empty()) {
-            throw std::invalid_argument("Image is empty");
+            throw invalid_argument("Image is empty");
         }
     
         vector<vector<vector<uint8_t>>> outputImg;
@@ -140,7 +140,7 @@ vector<vector<vector<uint8_t>>> BoxFilter::applyBoxFilterSlidingRGB(
         int cols = inputImg[0].size();  // Number of columns in the input image
         int channels = inputImg[0][0].size(); // Number of color channels
         if (kernelSize > rows || kernelSize > cols || kernelSize % 2 == 0) {
-            throw std::invalid_argument("Invalid kernel size");
+            throw invalid_argument("Invalid kernel size");
         }
         int border = kernelSize / 2; // Border size for padding to handle edges
 

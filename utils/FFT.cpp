@@ -1,7 +1,7 @@
-#include "FFT.h"
+#include "FFT.hpp"
 #include <cmath>
 #include <cstdint>
-using namespace std;
+
 
 void FFT::fft(vector<Complex>& x, bool inverse) {
     size_t n = x.size();
@@ -63,7 +63,7 @@ vector<vector<uint8_t>> FFT::extractOriginalSize(const vector<vector<double>>& p
     
     for (int i = 0; i < originalRows; i++) {
         for (int j = 0; j < originalCols; j++) {
-            result[i][j] = static_cast<uint8_t>(std::round(paddedResult[i][j]));
+            result[i][j] = static_cast<uint8_t>(round(paddedResult[i][j]));
         }
     }
     

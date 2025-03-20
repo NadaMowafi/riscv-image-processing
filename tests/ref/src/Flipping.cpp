@@ -24,27 +24,27 @@ void ImageFlipper::flip(Image&image, FlippingDirection direction){
 
 
 
-void ImageFlipper::flipVertical(std::vector<std::vector<uint8_t>>& matrix) {
+void ImageFlipper::flipVertical(vector<vector<uint8_t>>& matrix) {
     size_t height = matrix.size();
     size_t width = matrix[0].size();
 
 
     for (size_t i = 0; i < height / 2; ++i) {
         for (size_t j = 0; j < width; ++j) {
-            std::swap(matrix[i][j], matrix[height - 1 - i][j]);
+            swap(matrix[i][j], matrix[height - 1 - i][j]);
         }
     }
     
 }
 
-void ImageFlipper::flipHorizontal(std::vector<std::vector<uint8_t>>& matrix) {
+void ImageFlipper::flipHorizontal(vector<vector<uint8_t>>& matrix) {
     size_t height = matrix.size();
     size_t width = matrix[0].size();
 
     
     for (size_t i = 0; i < height; ++i) {
         for (size_t j = 0; j < width / 2; ++j) {
-            std::swap(matrix[i][j], matrix[i][width - 1 - j]);
+            swap(matrix[i][j], matrix[i][width - 1 - j]);
         }
     }
     

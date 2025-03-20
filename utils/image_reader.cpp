@@ -4,13 +4,13 @@
 
 ImageReader::ImageReader() {}
 
-ImageStatus ImageReader::readImage(const std::string& filePath, Image& image) {
-    std::ifstream file(filePath, std::ios::binary);
+ImageStatus ImageReader::readImage(const string& filePath, Image& image) {
+    ifstream file(filePath, ios::binary);
     if (!file.is_open()) {
         return ImageStatus::FILE_NOT_FOUND;
     }
 
-    std::vector<uint8_t> rawData((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    vector<uint8_t> rawData((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
     file.close();
 
     if (rawData.empty()) {
@@ -32,7 +32,7 @@ ImageStatus ImageReader::readImage(const std::string& filePath, Image& image) {
     }
 }
 
-ImageFormat ImageReader::detectFormat(const std::vector<uint8_t>& rawData) {
+ImageFormat ImageReader::detectFormat(const vector<uint8_t>& rawData) {
     if (rawData.size() >= 2 && rawData[0] == 'P' && rawData[1] == '5') {
         return ImageFormat::PGM;
     } else if (rawData.size() >= 8 &&
@@ -49,33 +49,33 @@ ImageFormat ImageReader::detectFormat(const std::vector<uint8_t>& rawData) {
     return ImageFormat::UNKNOWN;
 }
 
-ImageStatus ImageReader::parseMetadata(const std::vector<uint8_t>&, ImageMetadata&) {
+ImageStatus ImageReader::parseMetadata(const vector<uint8_t>&, ImageMetadata&) {
     return ImageStatus::SUCCESS; // Reserved for shared metadata logic if needed.
 }
 
-ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& image) {
-    std::istringstream stream(std::string(rawData.begin(), rawData.end()));
-    std::string line;
-    std::string magicNumber;
+ImageStatus ImageReader::parsePGM(const vector<uint8_t>& rawData, Image& image) {
+    istringstream stream(string(rawData.begin(), rawData.end()));
+    string line;
+    string magicNumber;
     uint32_t width = 0, height = 0, maxValue = 0;
 
     // Read magic number
-    std::getline(stream, line);
+    getline(stream, line);
     if (line != "P5") {
         return ImageStatus::PARSE_ERROR;
     }
     magicNumber = line;
 
     // Read width, height, and maxValue while skipping comments
-    while (std::getline(stream, line)) {
+    while (getline(stream, line)) {
         if (line.empty() || line[0] == '#') continue;
-        std::istringstream dimensions(line);
+        istringstream dimensions(line);
         dimensions >> width >> height;
         if (width > 0 && height > 0) break;
     }
-    while (std::getline(stream, line)) {
+    while (getline(stream, line)) {
         if (line.empty() || line[0] == '#') continue;
-        std::istringstream maxValStream(line);
+        istringstream maxValStream(line);
         maxValStream >> maxValue;
         if (maxValue > 0) break;
     }
@@ -101,7 +101,7 @@ ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& im
     image.pixelData.assign(rawData.begin() + headerSize, rawData.begin() + headerSize + width * height);
 
     // Fill pixelMatrix
-    image.pixelMatrix.resize(height, std::vector<uint8_t>(width));
+    image.pixelMatrix.resize(height, vector<uint8_t>(width));
     for (uint32_t i = 0; i < height; ++i) {
         for (uint32_t j = 0; j < width; ++j) {
             image.pixelMatrix[i][j] = image.pixelData[i * width + j];
@@ -112,14 +112,14 @@ ImageStatus ImageReader::parsePGM(const std::vector<uint8_t>& rawData, Image& im
 }
 
 // Placeholder implementations for future formats
-ImageStatus ImageReader::parsePNG(const std::vector<uint8_t>&, Image&) {
+ImageStatus ImageReader::parsePNG(const vector<uint8_t>&, Image&) {
     return ImageStatus::UNSUPPORTED_FORMAT; // Implement later
 }
 
-ImageStatus ImageReader::parseJPEG(const std::vector<uint8_t>&, Image&) {
+ImageStatus ImageReader::parseJPEG(const vector<uint8_t>&, Image&) {
     return ImageStatus::UNSUPPORTED_FORMAT; // Implement later
 }
 
-ImageStatus ImageReader::parseBMP(const std::vector<uint8_t>&, Image&) {
+ImageStatus ImageReader::parseBMP(const vector<uint8_t>&, Image&) {
     return ImageStatus::UNSUPPORTED_FORMAT; // Implement later
 }

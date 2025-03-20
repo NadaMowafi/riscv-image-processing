@@ -1,8 +1,8 @@
 #include "image_reader.hpp"
 #include "image_writer.hpp"
-#include "BoxFilter.h"
+#include "BoxFilter.hpp"
 #include "Gaussian.hpp"
-#include "FFT.h"
+#include "FFT.hpp"
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -18,20 +18,20 @@ int main() {
     // -------------------Apply BoxFilter FFT----------------------- 
     ImageStatus status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
-        std::cerr << "Failed to read image: " << static_cast<int>(status) << std::endl;
+        cerr << "Failed to read image: " << static_cast<int>(status) << endl;
         return 1;
     }
-    std::cout << "Image read successfully. Size: "
+    cout << "Image read successfully. Size: "
               << image.metadata.width << "x"
-              << image.metadata.height << std::endl;
+              << image.metadata.height << endl;
 
     
-    std::vector<std::vector<uint8_t>> filteredMatrix = BoxFilter.applyBoxFilterFFT(image.pixelMatrix, kernelSize);
+    vector<vector<uint8_t>> filteredMatrix = BoxFilter.applyBoxFilterFFT(image.pixelMatrix, kernelSize);
     image.pixelMatrix = filteredMatrix;
     
     status = writer.writeImage("barb.512blur_fft.pgm", image);
     if (status != ImageStatus::SUCCESS) {
-        std::cerr << "Failed to write FFT filtered image: " << static_cast<int>(status) << std::endl;
+        cerr << "Failed to write FFT filtered image: " << static_cast<int>(status) << endl;
         return 1;
     }
     cout << "FFT Filtered image written successfully." << endl;
@@ -39,7 +39,7 @@ int main() {
     // -------------------Apply BoxFilter Sliding-----------------------
     status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
-        std::cerr << "Failed to read image: " << static_cast<int>(status) << std::endl;
+        cerr << "Failed to read image: " << static_cast<int>(status) << endl;
         return 1;
     }
     
@@ -48,16 +48,16 @@ int main() {
 
     status = writer.writeImage("barb.512blur_sliding.pgm", image);
     if (status != ImageStatus::SUCCESS) {
-        std::cerr << "Failed to write Sliding Window filtered image: " << static_cast<int>(status) << std::endl;
+        cerr << "Failed to write Sliding Window filtered image: " << static_cast<int>(status) << endl;
         return 1;
     }
 
-    cout << "Sliding Window filtered image written successfully." << std::endl;
+    cout << "Sliding Window filtered image written successfully." << endl;
 
     // -------------------Apply Gaussian Filter-----------------------
     status = reader.readImage("barb.512.pgm", image);
     if (status != ImageStatus::SUCCESS) {
-        std::cerr << "Failed to read image: " << static_cast<int>(status) << std::endl;
+        cerr << "Failed to read image: " << static_cast<int>(status) << endl;
         return 1;
     }
     double sigma = 3;
@@ -68,7 +68,7 @@ int main() {
 
     status = writer.writeImage("barb.512blur_gaussian.pgm", image);
     if (status != ImageStatus::SUCCESS) {
-        std::cerr << "Failed to write Gaussian filtered image: " << static_cast<int>(status) << std::endl;
+        cerr << "Failed to write Gaussian filtered image: " << static_cast<int>(status) << endl;
         return 1;
     }
 
