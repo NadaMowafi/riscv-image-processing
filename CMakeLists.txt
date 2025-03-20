@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+enable_testing()  # Enables CTest for this project
 
 #################################################
 
@@ -25,11 +26,16 @@ add_subdirectory(utils)
 
 ##################################################
 
-#Add the cpp file that would run the test here
-add_executable(main_test filters_test.cpp)
+# Add the cpp file that would run the test here
+add_executable(main_test examples/filters_test.cpp)
+
+add_test(NAME main_test COMMAND main_test)
 
 ##################################################
 
+target_link_libraries(main_test PUBLIC tests models UtilsLib)
 
+##################################################
 
-target_link_libraries(main_test PUBLIC tests models UtilsLib)  
+# Copy the test image file to the build directory
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/barb.512.pgm COPYONLY)
