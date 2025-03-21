@@ -1,7 +1,7 @@
 #ifndef FLIPPING_HPP
 #define FLIPPING_HPP
 #include <stdexcept>
-#include "image.hpp"
+#include "Image.hpp"
 #include <vector>
 using namespace std;
 
@@ -13,21 +13,22 @@ enum class FlippingDirection
 
 };
 
-class FlipError : public runtime_error {
-    public:
-        explicit FlipError(const string& message) : runtime_error(message) {}
+class FlipError : public runtime_error
+{
+public:
+    explicit FlipError(const string &message) : runtime_error(message) {}
 };
 
-class ImageFlipper 
+template <typename T = uint8_t>
+class ImageFlipper
 {
 
 public:
-   void flip(Image&image, const FlippingDirection direction);
+    static void flip(Image<T> &image, const FlippingDirection direction);
 
 private:
-   void flipVertical(vector<vector<uint8_t>>& matrix);
-   void flipHorizontal(vector<vector<uint8_t>>& matrix);
-
+    static void flipVertical(vector<vector<T>> &matrix);
+    static void flipHorizontal(vector<vector<T>> &matrix);
 };
 
-#endif  //FLIPPING_HPP
+#endif // FLIPPING_HPP

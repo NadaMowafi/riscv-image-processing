@@ -9,14 +9,15 @@
 #include <cstdint>
 using namespace std;
 
-class BoxFilter {
-    public:
-    vector<vector<uint8_t>> applyBoxFilterFFT(
-            const vector<vector<uint8_t>>& image, int kernelSize);
-    vector<vector<uint8_t>> applyBoxFilterSlidingGrey(
-            const vector<vector<uint8_t>>& inputImg, int kernelSize);
-    vector<vector<vector<uint8_t>>> applyBoxFilterSlidingRGB(
-            const vector<vector<vector<uint8_t>>>& inputImg, int kernelSize);
-
+template <typename T = uint8_t>
+class BoxFilter
+{
+public:
+    static vector<vector<T>> applyBoxFilterFFT(
+        const vector<vector<T>> &image, int kernelSize);
+    static vector<vector<T>> applyBoxFilterSlidingGrey(
+        const vector<vector<T>> &inputImg, int kernelSize);
+    static vector<vector<vector<T>>> applyBoxFilterSlidingRGB(
+        const vector<vector<vector<T>>> &inputImg, int kernelSize);
 };
 #endif // BOXFILTER_HPP

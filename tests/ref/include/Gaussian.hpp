@@ -12,18 +12,21 @@ vector<vector<double>> generateGaussianKernel(int kernelSize, double sigma);
 
 // Applies a Gaussian filter (convolution) to the input image.
 // The image is represented as a 2D vector of uint8_t (grayscale values).
-vector<vector<uint8_t>> applyGaussianFilter(
-    const vector<vector<uint8_t>>& image,
-    const vector<vector<double>>& kernel);
+template <typename T = uint8_t>
+vector<vector<T>> applyGaussianFilter(
+    const vector<vector<T>> &image,
+    const vector<vector<double>> &kernel);
 
 // Padding the image for convolution
-vector<vector<uint8_t>> zeroPad(const vector<vector<uint8_t>>& image, int padSize);
+template <typename T = uint8_t>
+vector<vector<T>> zeroPad(const vector<vector<T>> &image, int padSize);
 
 // Generates a 1D Gaussian kernel.
 vector<double> generateGaussianKernel1D(int kernelSize, double sigma);
 
 // Applies a separable Gaussian filter to the input image.
-vector<vector<uint8_t>> applyGaussianFilterSeparable(
-    const vector<vector<uint8_t>>& image, int kernelSize, double sigma);
+template <typename T = uint8_t>
+vector<vector<T>> applyGaussianFilterSeparable(
+    const vector<vector<T>> &image, int kernelSize, double sigma);
 
 #endif // GAUSSIANFILTER_H
