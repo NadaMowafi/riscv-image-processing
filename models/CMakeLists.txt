@@ -1,6 +1,6 @@
 add_library(models STATIC 
-            complex.cpp
-            image.cpp
+            Complex.cpp
+            Image.cpp
             )
             
 target_include_directories(models

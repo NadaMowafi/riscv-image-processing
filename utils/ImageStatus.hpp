@@ -22,9 +22,13 @@ enum class ImageStatus
   INVALID_DIMENSIONS = 300,
   INVALID_CHANNELS = 301,
   INVALID_PARAMETERS = 302,
+  INVALID_DATASIZE = 303,
 
   // Runtime errors
   RUNTIME_ERROR = 400,
+
+  // Unimplemented features
+  UNIMPLEMENTED_FEATURE = 500,
 
   // Unknown/other errors
   UNKNOWN_ERROR = 999

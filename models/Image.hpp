@@ -4,10 +4,11 @@
 #include <vector>
 #include <string>
 #include <cstdint>
-#include "image_status.hpp"
+#include "ImageStatus.hpp"
 using namespace std;
 
-enum class ImageFormat {
+enum class ImageFormat
+{
     UNKNOWN,
     PGM,
     PNG,
@@ -15,20 +16,23 @@ enum class ImageFormat {
     BMP
 };
 
-struct ImageMetadata {
+struct ImageMetadata
+{
     ImageFormat format = ImageFormat::UNKNOWN;
     uint32_t width = 0;
     uint32_t height = 0;
     uint32_t maxValue = 0;
 };
 
-struct Image {
+template <typename T = uint8_t>
+struct Image
+{
     ImageMetadata metadata;
-    vector<uint8_t> pixelData; // Flat array (if you just want the matrix)
-    vector<vector<uint8_t>> pixelMatrix; // 2D pixel array
+    vector<T> pixelData;           // Flat array (if you just want the matrix)
+    vector<vector<T>> pixelMatrix; // 2D pixel array
 };
 
-
-ImageStatus validateImage(const Image& image);
+template <typename T = uint8_t>
+ImageStatus validateImage(const Image<T> &image);
 
 #endif // IMAGE_HPP

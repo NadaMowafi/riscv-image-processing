@@ -1,9 +1,17 @@
+#ifndef FFT_CPP
+#define FFT_CPP
+
 #include "FFT.hpp"
 #include <cmath>
 #include <cstdint>
 
+template class FFT<uint8_t>;
+template class FFT<uint16_t>;
+template class FFT<uint32_t>;
+template class FFT<uint64_t>;
 
-void FFT::fft(vector<Complex>& x, bool inverse) {
+template <typename T>
+void FFT<T>::fft(vector<Complex>& x, bool inverse) {
     size_t n = x.size();
     if (n <= 1) return;
 
@@ -39,7 +47,8 @@ void FFT::fft(vector<Complex>& x, bool inverse) {
     }
 }
 
-void FFT::fft2D(vector<vector<Complex>>& image, bool inverse) {
+template <typename T>
+void FFT<T>::fft2D(vector<vector<Complex>>& image, bool inverse) {
     int rows = image.size();
     int cols = image[0].size();
     for (int i = 0; i < rows; i++) {
@@ -57,20 +66,22 @@ void FFT::fft2D(vector<vector<Complex>>& image, bool inverse) {
     }
 }
 
-vector<vector<uint8_t>> FFT::extractOriginalSize(const vector<vector<double>>& paddedResult, int originalRows, int originalCols) {
+template <typename T>
+vector<vector<T>> FFT<T>::extractOriginalSize(const vector<vector<double>>& paddedResult, int originalRows, int originalCols) {
     
-    vector<vector<uint8_t>> result(originalRows, vector<uint8_t>(originalCols, 0));
+    vector<vector<T>> result(originalRows, vector<T>(originalCols, 0));
     
     for (int i = 0; i < originalRows; i++) {
         for (int j = 0; j < originalCols; j++) {
-            result[i][j] = static_cast<uint8_t>(round(paddedResult[i][j]));
+            result[i][j] = static_cast<T>(round(paddedResult[i][j]));
         }
     }
     
     return result;
 }
 
-vector<vector<double>> FFT::zeroPad(const vector<vector<double>>& image) {
+template <typename T>
+vector<vector<double>> FFT<T>::zeroPad(const vector<vector<double>>& image) {
     int rows = image.size();
     int cols = image[0].size();
     
@@ -86,3 +97,5 @@ vector<vector<double>> FFT::zeroPad(const vector<vector<double>>& image) {
 
     return padded;
 }
+
+#endif // FFT_CPP

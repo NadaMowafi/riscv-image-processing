@@ -1,7 +1,7 @@
 add_library(tests STATIC 
             ref/src/BoxFilter.cpp 
             ref/src/Gaussian.cpp  
-            ref/src/rotate.cpp 
+            ref/src/Rotate.cpp 
             ref/src/Flipping.cpp
             )
 
