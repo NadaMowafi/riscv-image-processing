@@ -5,6 +5,7 @@
 #include "BoxFilter.hpp"
 #include "Gaussian.hpp"
 #include "FFT.hpp"
+#include "Add.hpp"
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -100,6 +101,31 @@ int main() {
         return 1;
     }
     cout << "Horizontal flipped image written successfully." << endl;
+    //-----------Add Weighted of two images-------------------
+    Image image1;
+    Image image2;
+    Image addedImage;
 
+    status = reader.readImage("barb.512.pgm", image1);
+    if (status != ImageStatus::SUCCESS) {
+        std::cerr << "Failed to read image 1: " << static_cast<int>(status) << std::endl;
+        return 1;
+    }
+   status = reader.readImage("3things256.pgm", image2);
+    if (status != ImageStatus::SUCCESS) {
+        std::cerr << "Failed to read image 2: " << static_cast<int>(status) << std::endl;
+        return 1;
+    }
+
+    vector<vector<uint8_t>> output= addWeighted(image1.pixelMatrix,0.6,image2.pixelMatrix,0.4,50,CLIPPING::SATURATION);
+    addedImage.pixelMatrix = output;
+    addedImage.metadata = image1.metadata;
+    addedImage.pixelData = image1.pixelData;
+    ImageStatus saveStatus = writer.writeImage("addedWeightedImage.pgm", addedImage);
+    if (status != ImageStatus::SUCCESS) {
+        cerr << "Failed to write flipped image: " << static_cast<int>(status) << endl;
+        return 1;
+    }
+    cout << "Added two image with thier weights successfully.." << endl;
     return 0;
 }
