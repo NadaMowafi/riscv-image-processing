@@ -39,3 +39,4 @@ target_link_libraries(main_test PUBLIC tests models UtilsLib)
 
 # Copy the test image file to the build directory
 configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/barb.512.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/3things256.pgm ${CMAKE_BINARY_DIR}/3things256.pgm COPYONLY)
