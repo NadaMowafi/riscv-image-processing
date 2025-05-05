@@ -6,6 +6,7 @@
 using namespace std;
 
 template <typename T = uint8_t>
+
 class ImageReader
 {
 public:

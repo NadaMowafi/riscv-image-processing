@@ -197,4 +197,5 @@ ImageStatus ImageReader<T>::parseBMP(const vector<T> &, Image<T> &)
     return ImageStatus::UNIMPLEMENTED_FEATURE; // Implement later
 }
 
+
 #endif // IMAGE_READER_CPP
