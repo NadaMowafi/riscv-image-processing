@@ -12,8 +12,8 @@ set(CMAKE_RANLIB       "/home/omar/riscv-gnu-toolchain/build/install/bin/riscv64
 set(CMAKE_OBJCOPY      "/home/omar/riscv-gnu-toolchain/build/install/bin/riscv64-unknown-elf-objcopy")
 set(CMAKE_OBJDUMP      "/home/omar/riscv-gnu-toolchain/build/install/bin/riscv64-unknown-elf-objdump")
 
-set(CMAKE_C_FLAGS   "-march=rv64gcv -mabi=lp64d" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS "-march=rv64gcv -mabi=lp64d" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS   "-march=rv64gcv_zvfh -mabi=lp64d" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS "-march=rv64gcv_zvfh -mabi=lp64d" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_RELEASE "-O2" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "" FORCE)
 # Prevent CMake probing adds -latomic

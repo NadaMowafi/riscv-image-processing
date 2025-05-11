@@ -7,24 +7,61 @@
 #include <cmath>
 using std::vector;
 
-// Generates a normalized 1D Gaussian kernel (floating-point, compatible with scalar version)
-vector<double> __riscv_generateGaussianKernel1D(int kernelSize, double sigma) {
-    if (kernelSize % 2 == 0) kernelSize += 1;
-    int half = kernelSize / 2;
+std::vector<double> __riscv_generateGaussianKernel1D(int N, double sigma) {
+    if ((N & 1) == 0) ++N;
+    int half       = N >> 1;
+    double twoSig2 = 2.0 * sigma * sigma;
 
-    vector<double> kernel(kernelSize);
-    double twoSigmaSq = 2.0 * sigma * sigma;
-    double sum = 0.0;
+    std::vector<double> arg(N), kernel(N);
 
-    for (int i = 0; i < kernelSize; ++i) {
-        int x = i - half;
-        double v = std::exp(-(x * x) / twoSigmaSq);
-        kernel[i] = v;
-        sum += v;
+    int i = 0;
+    while (i < N) {
+        // 1) set VL
+        size_t vl = __riscv_vsetvl_e64m4(N - i);
+
+        // 2) build index vector [i, i+1, ...]
+        vuint64m4_t vidx = __riscv_vid_v_u64m4(vl);
+        vidx = __riscv_vadd_vx_u64m4(vidx, (uint64_t)i, vl);
+        vfloat64m4_t v_i = __riscv_vfcvt_f_x_v_f64m4(__riscv_vreinterpret_v_u64m4_i64m4(vidx), vl);
+
+        // 3) compute (i-half)
+        vfloat64m4_t v_x  = __riscv_vfsub_vf_f64m4(v_i, (double)half, vl);
+
+        // 4) square and divide by 2σ²
+        vfloat64m4_t v_x2 = __riscv_vfmul_vv_f64m4(v_x, v_x, vl);
+        vfloat64m4_t v_arg= __riscv_vfdiv_vf_f64m4(v_x2, twoSig2, vl);
+
+        // 5) store to your arg[] buffer
+        __riscv_vse64_v_f64m4(&arg[i], v_arg, vl);
+
+        i += vl;
     }
-    for (auto &v : kernel) v /= sum;
+
+    // 6) scalar exp
+    double sum = 0.0;
+    for (int j = 0; j < N; ++j) {
+        kernel[j] = std::exp(-arg[j]);
+        sum += kernel[j];
+    }
+    // 7) normalize
+    i = 0;
+    while (i < N) {
+        size_t vl = __riscv_vsetvl_e64m4(N - i);
+
+        // Load kernel values
+        vfloat64m4_t v_kernel = __riscv_vle64_v_f64m4(&kernel[i], vl);
+
+        // Divide by the sum
+        v_kernel = __riscv_vfdiv_vf_f64m4(v_kernel, sum, vl);
+
+        // Store back normalized values
+        __riscv_vse64_v_f64m4(&kernel[i], v_kernel, vl);
+
+        i += vl;
+    }
     return kernel;
 }
+
 
 template <typename T>
 static vector<vector<T>> __riscv_zeroPadImage(const vector<vector<T>>& image, int padSize) {
