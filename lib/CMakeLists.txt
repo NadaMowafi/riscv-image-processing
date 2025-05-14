@@ -1,5 +1,6 @@
 add_library(lib STATIC  
             src/Rotate.cpp
+            src/BilateralFilter.cpp
             #please add any other source files you need to compile here
             # e.g. src/other_file.cpp
             )
