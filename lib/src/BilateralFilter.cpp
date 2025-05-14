@@ -3,8 +3,7 @@
 #include <vector>
 #include <type_traits>
 #include <riscv_vector.h>
-#include "BilateralFilter.hpp"  
-
+#include "BilateralFilter.hpp"
 
 using std::vector;
 
@@ -81,7 +80,30 @@ static vector<vector<T>> __riscv_zeroPadImage(const vector<vector<T>>& image, in
     return padded;
 }
 
-// Bilateral Filter using RVV for grayscale uint8_t images
+vector<double> computeRangeLUT(double sigmaRange) {
+    vector<double> rangeLUT(256);
+    double twoSigmaRange2 = 2.0 * sigmaRange * sigmaRange;
+
+    int i = 0;
+    while (i < 256) {
+        size_t vl = __riscv_vsetvl_e64m4(256 - i);
+        vuint64m4_t v_idx = __riscv_vid_v_u64m4(vl); // Generate indices
+        v_idx = __riscv_vadd_vx_u64m4(v_idx, i, vl); // Offset indices by i
+        vfloat64m4_t v_idx_f = __riscv_vfcvt_f_x_v_f64m4(__riscv_vreinterpret_v_u64m4_i64m4(v_idx), vl);
+        vfloat64m4_t v_idx2 = __riscv_vfmul_vv_f64m4(v_idx_f, v_idx_f, vl); // Square the indices
+        vfloat64m4_t v_arg = __riscv_vfdiv_vf_f64m4(v_idx2, twoSigmaRange2, vl); // Divide by 2 * sigma^2
+        __riscv_vse64_v_f64m4(&rangeLUT[i], v_arg, vl); // Store the intermediate results in rangeLUT
+        i += vl;
+    }
+
+    // Perform scalar exp(-x) on the final results
+    for (int i = 0; i < 256; ++i) {
+        rangeLUT[i] = std::exp(-rangeLUT[i]);
+    }
+
+    return rangeLUT;
+}
+
 vector<vector<uint8_t>> bilateralFilterRVV(
     const vector<vector<uint8_t>>& image,
     int kernelSize,
@@ -97,10 +119,7 @@ vector<vector<uint8_t>> bilateralFilterRVV(
     vector<vector<uint8_t>> padded = __riscv_zeroPadImage(image, halfK);
     vector<vector<uint8_t>> output(H, vector<uint8_t>(W, 0));
 
-    vector<double> rangeLUT(256);
-    double twoSigmaRange2 = 2.0 * sigmaRange * sigmaRange;
-    for (int i = 0; i < 256; ++i)
-        rangeLUT[i] = std::exp(- (i * i) / twoSigmaRange2);
+    vector<double> rangeLUT = computeRangeLUT(sigmaRange);
 
     for (int i = 0; i < H; ++i) {
         for (int j = 0; j < W; ++j) {
@@ -115,37 +134,56 @@ vector<vector<uint8_t>> bilateralFilterRVV(
                     size_t vl = __riscv_vsetvl_e8m4(kernelSize - kj);
                     int c = j + kj;
 
-                    
-                    vuint8m2_t v_pix = __riscv_vle8_v_u8m2(&padded[r][c], vl); 
-                    vuint16m4_t v_pix_i16 = __riscv_vzext_vf2_u16m4(v_pix, vl);
-                    vint16m4_t v_pix_i16_signed = __riscv_vreinterpret_v_u16m4_i16m4(v_pix_i16); 
+                    // Load pixel values
+                    vuint8m2_t v_pix = __riscv_vle8_v_u8m2(&padded[r][c], vl);
+                    vuint16m4_t v_pix_u16 = __riscv_vzext_vf2_u16m4(v_pix, vl); // Zero-extend to 16 bits
+                    vuint32m4_t v_pix_u32 = __riscv_vreinterpret_v_u16m4_u32m4(v_pix_u16);
+
+
+                    // // Convert to float64
+                    vfloat32m4_t v_padded_f32 = __riscv_vfcvt_f_xu_v_f32m4(v_pix_u32, vl);
+                    vfloat64m8_t v_padded = __riscv_vfwcvt_f_f_v_f64m8(v_padded_f32, vl);
+
+                    // Convert to signed 16-bit integer
+                    vint16m4_t v_pix_i16_signed = __riscv_vreinterpret_v_u16m4_i16m4(v_pix_u16);
                     vint16m4_t v_center = __riscv_vmv_v_x_i16m4(center, vl);
+
+                    // Compute absolute differences
                     vint16m4_t v_diff = __riscv_vsub_vv_i16m4(v_pix_i16_signed, v_center, vl);
                     vbool4_t mask = __riscv_vmslt_vx_i16m4_b4(v_diff, 0, vl);
-                    v_diff = __riscv_vneg_v_i16m4_m(mask, v_diff, vl); 
+                    v_diff = __riscv_vneg_v_i16m4_m(mask, v_diff, vl);
 
+                    // Map differences to range LUT
                     vuint16m4_t v_diff_u16 = __riscv_vreinterpret_v_i16m4_u16m4(v_diff);
                     vuint32m8_t v_idx = __riscv_vzext_vf2_u32m8(v_diff_u16, vl);
-                    vint32m8_t v_idx_signed = __riscv_vreinterpret_v_u32m8_i32m8(v_idx); 
 
-
-
-                    alignas(64) uint32_t indices[vl];
-                    __riscv_vse32_v_i32m8(reinterpret_cast<int*>(indices), v_idx_signed, vl);
-
-                    alignas(64) double v_range[vl];
-                    for (size_t x = 0; x < vl; ++x)
-                        v_range[x] = rangeLUT[indices[x]];
-
-                    alignas(64) double v_spatial[vl];
-                    for (size_t x = 0; x < vl; ++x)
-                        v_spatial[x] = spatialKernel[ki] * spatialKernel[kj + x];
-
+                    // Load range LUT values
+                    vfloat64m8_t v_range = __riscv_vundefined_f64m8();
                     for (size_t x = 0; x < vl; ++x) {
-                        double weight = v_spatial[x] * v_range[x];
-                        norm += weight;
-                        result += weight * padded[r][c + x];
+                        uint32_t idx = reinterpret_cast<uint32_t*>(&v_idx)[x];
+                        reinterpret_cast<double*>(&v_range)[x] = rangeLUT[idx];
                     }
+
+                    // Compute spatial kernel values
+                    vfloat64m8_t v_spatial = __riscv_vundefined_f64m8();
+                    for (size_t x = 0; x < vl; ++x) {
+                        reinterpret_cast<double*>(&v_spatial)[x] = spatialKernel[ki] * spatialKernel[kj + x];
+                    }
+
+                    // Compute weights
+                    vfloat64m8_t v_weight = __riscv_vfmul_vv_f64m8(v_spatial, v_range, vl);
+                    vfloat64m8_t v_weighted_padded = __riscv_vfmul_vv_f64m8(v_weight, v_padded, vl);
+                    // Initialize accumulators for reduction
+                    vfloat64m1_t v_acc_norm = __riscv_vfmv_s_f_f64m1(0.0, vl); // Initialize accumulator for norm
+                    vfloat64m1_t v_acc_result = __riscv_vfmv_s_f_f64m1(0.0, vl); // Initialize accumulator for result
+                    // Perform reduction
+                    v_acc_norm = __riscv_vfredusum_vs_f64m8_f64m1(v_weight, v_acc_norm, vl);
+                    v_acc_result = __riscv_vfredusum_vs_f64m8_f64m1(v_weighted_padded, v_acc_result, vl);
+            
+                    // Extract scalar values from accumulators
+                    norm += __riscv_vfmv_f_s_f64m1_f64(v_acc_norm);
+                    result += __riscv_vfmv_f_s_f64m1_f64(v_acc_result);
+                                        
 
                     kj += vl;
                 }
@@ -154,6 +192,5 @@ vector<vector<uint8_t>> bilateralFilterRVV(
             output[i][j] = static_cast<uint8_t>(std::round(result / norm));
         }
     }
-
     return output;
 }
