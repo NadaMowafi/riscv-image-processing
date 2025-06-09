@@ -38,7 +38,7 @@ add_test(NAME main_test COMMAND main_test)
 
 ##################################################
 
-target_link_libraries(main_test PUBLIC tests models UtilsLib)
+target_link_libraries(main_test PUBLIC tests models UtilsLib lib)
 
 ##################################################
 
