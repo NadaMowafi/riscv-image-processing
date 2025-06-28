@@ -36,12 +36,12 @@ extern template vector<vector<uint16_t>> __riscv_BoxFilter<uint16_t>(
     const vector<vector<uint16_t>> &,
     int);
 
-extern template vector<vector<uint32_t>> __riscv_zeroPadImage<uint32_t>(
-        const vector<vector<uint32_t>>&,
-        int);
-    extern template vector<vector<uint32_t>> __riscv_BoxFilter<uint32_t>(
-        const vector<vector<uint32_t>>&,
-        int);
+// extern template vector<vector<uint32_t>> __riscv_zeroPadImage<uint32_t>(
+//         const vector<vector<uint32_t>>&,
+//         int);
+//     extern template vector<vector<uint32_t>> __riscv_BoxFilter<uint32_t>(
+//         const vector<vector<uint32_t>>&,
+//         int);
     
 
 

@@ -9,20 +9,20 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
-
+#include "BoxFilter_Vector_Template.hpp"
+#include <chrono>
 using namespace std;
-
 int main() {
-    ImageReader reader;
-    ImageWriter writer;
+    ImageReader  reader;
+    ImageWriter  writer;
     ImageRotator rotator;
     ImageFlipper flipper;
-    BoxFilter boxFilter;
-    Image image;
-    Image filteredImage;
-    int kernelSize = 5;
-    double sigma = 1.0;
-
+    BoxFilter    boxFilter;
+    Image        image;
+    Image        filteredImage;
+    int          kernelSize = 5;
+    double       sigma = 1.0;
+    const int    iterations = 100;
 //     // Read the image
 //     ImageStatus status = reader.readImage("barb.512.pgm", image);
 //     if (status != ImageStatus::SUCCESS) {
@@ -42,20 +42,31 @@ int main() {
 //     cout << "FFT Filtered image written successfully." << endl;
 
 //     // ------------------- Apply BoxFilter Sliding -----------------------
-//     status = reader.readImage("barb.512.pgm", image);
-//     if (status != ImageStatus::SUCCESS) {
-//         cerr << "Failed to read image: " << static_cast<int>(status) << endl;
-//         return 1;
-//     }
-//     vector<vector<uint8_t>> filteredMatrixSliding = boxFilter.applyBoxFilterSlidingGrey(image.pixelMatrix, kernelSize);
-//     image.pixelMatrix = filteredMatrixSliding;
-//     status = writer.writeImage("barb.512blur_sliding.pgm", image);
-//     if (status != ImageStatus::SUCCESS) {
-//         cerr << "Failed to write Sliding Window filtered image: " << static_cast<int>(status) << endl;
-//         return 1;
-//     }
-//     cout << "Sliding Window filtered image written successfully." << endl;
+{
+ImageStatus status = reader.readImage("barb.512.pgm", image);
+if (status != ImageStatus::SUCCESS) {
+    cerr << "Failed to read image: " << static_cast<int>(status) << endl;
+    return 1;
+}
 
+// Benchmark start
+auto start = std::chrono::high_resolution_clock::now();
+
+vector<vector<uint8_t>> filteredMatrixSliding = boxFilter.applyBoxFilterSlidingGrey(image.pixelMatrix, kernelSize);
+
+// Benchmark end
+auto end = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+cout << "BoxFilter Sliding Window took " << duration << " ms." << endl;
+
+image.pixelMatrix = filteredMatrixSliding;
+status = writer.writeImage("Gaussian_Vector.pgm", image);
+if (status != ImageStatus::SUCCESS) {
+    cerr << "Failed to write Sliding Window filtered image: " << static_cast<int>(status) << endl;
+    return 1;
+}
+cout << "Sliding Window filtered image written successfully." << endl;
+}
 //     // ------------------- Apply Gaussian Filter -----------------------
 //     status = reader.readImage("barb.512.pgm", image);
 //     if (status != ImageStatus::SUCCESS) {
@@ -106,29 +117,56 @@ int main() {
 //     return 0;
 // }
 // ------------------- Vectorized Gaussian -----------------------
+// ImageStatus status = reader.readImage("barb.512.pgm", image);
+// if (status != ImageStatus::SUCCESS) {
+//     cerr << "Failed to read image: " << static_cast<int>(status) << endl;
+//     return 1;
+// }
+
+// cout << "Image read successfully. Size: "
+//      << image.metadata.width << "x"
+//      << image.metadata.height << endl;
+
+
+// auto output = __riscv_applyGaussianFilterSeparable<uint8_t>(image.pixelMatrix, kernelSize, sigma);
+
+// filteredImage.pixelMatrix = output;
+// filteredImage.pixelData = image.pixelData;
+// filteredImage.metadata = image.metadata;
+
+// status = writer.writeImage("Gaussian_Vector.pgm", filteredImage);
+// if (status != ImageStatus::SUCCESS) {
+//     cerr << "Failed to write image: " << static_cast<int>(status) << endl;
+//     return 1;
+// }
+// cout << "Gaussian filtered image written successfully." << endl;
+
+// return 0;
+// }
+// ------------------- Apply Vectorized BoxFilter -----------------------
 ImageStatus status = reader.readImage("barb.512.pgm", image);
 if (status != ImageStatus::SUCCESS) {
     cerr << "Failed to read image: " << static_cast<int>(status) << endl;
     return 1;
 }
+cout << "Applying vectorized BoxFilter..." << endl;
 
-cout << "Image read successfully. Size: "
-     << image.metadata.width << "x"
-     << image.metadata.height << endl;
+// Benchmark start
+auto start = std::chrono::high_resolution_clock::now();
 
+// Call your vectorized BoxFilter implementation
+vector<vector<uint8_t>> filteredMatrixVector = __riscv_BoxFilter<uint8_t>(image.pixelMatrix, kernelSize);
 
-auto output = __riscv_applyGaussianFilterSeparable<uint8_t>(image.pixelMatrix, kernelSize, sigma);
+// Benchmark end
+auto end = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+cout << "Vectorized BoxFilter took " << duration << " ms." << endl;
 
-filteredImage.pixelMatrix = output;
-filteredImage.pixelData = image.pixelData;
-filteredImage.metadata = image.metadata;
-
-status = writer.writeImage("Gaussian_Vector.pgm", filteredImage);
+image.pixelMatrix = filteredMatrixVector;
+status = writer.writeImage("Gaussian_Vector.pgm", image);
 if (status != ImageStatus::SUCCESS) {
-    cerr << "Failed to write image: " << static_cast<int>(status) << endl;
+    cerr << "Failed to write vectorized BoxFilter image: " << static_cast<int>(status) << endl;
     return 1;
 }
-cout << "Gaussian filtered image written successfully." << endl;
-
-return 0;
+cout << "Vectorized BoxFilter image written successfully." << endl;
 }

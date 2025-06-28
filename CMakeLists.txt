@@ -32,16 +32,32 @@ add_subdirectory(lib)
 ##################################################
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--as-needed")
 # Add the cpp file that would run the test here
-add_executable(main_test examples/filters_test.cpp)
-
-add_test(NAME main_test COMMAND main_test)
+add_executable(BoxFilterComparison examples/BoxFilterComparison.cpp)
+add_executable(GaussianComparison examples/GaussianComparison.cpp)
+add_executable(RotateFlipComparison examples/Rotate&FlipComparison.cpp)
+add_executable(AddComparison examples/AddComparison.cpp)
 
 ##################################################
 
-target_link_libraries(main_test PUBLIC tests models UtilsLib lib)
+target_link_libraries(BoxFilterComparison PUBLIC tests models UtilsLib lib)
+target_link_libraries(GaussianComparison PUBLIC tests models UtilsLib lib)
+target_link_libraries(RotateFlipComparison PUBLIC tests models UtilsLib lib)
+target_link_libraries(AddComparison PUBLIC tests models UtilsLib lib)
 
 ##################################################
 
 # Copy the test image file to the build directory
+#barb.512.pgm
 configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/barb.512.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Box_Vector.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Box_Scalar.pgm COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Gaussian_Vector.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Gaussian_Scalar.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Rotate_Vector.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Rotate_Scalar.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Flipping_Vector.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Flipping_Scalar.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Add_Vector.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Add_Scalar.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Bilateral_Vector.pgm COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/examples/barb.512.pgm ${CMAKE_BINARY_DIR}/Bilateral_Scalar.pgm COPYONLY)
