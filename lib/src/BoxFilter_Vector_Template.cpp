@@ -1,5 +1,5 @@
 #include "BoxFilter_Vector_Template.hpp"
-#include "VectorTraits_BoxFilter.hpp"
+#include "VectorTraits.hpp"
 // Define vector traits for different data types (u8/u16)
 
 // Templated zeroPad function

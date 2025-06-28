@@ -36,11 +36,11 @@ int main() {
     Image scalarOut = image;
     Image vectorOut = image;
 
-    auto kernel = generateGaussianKernel(kernelSize, sigma);
+    // auto kernel = generateGaussianKernel(kernelSize, sigma);
     // Lambdas for scalar and vector filtering
     auto scalar_fn = [&]() {
-        scalarOut.pixelMatrix = applyGaussianFilter(
-            image.pixelMatrix, kernel);
+        scalarOut.pixelMatrix = applyGaussianFilterSeparable(
+            image.pixelMatrix, kernelSize, sigma);
     };
     auto vector_fn = [&]() {
         vectorOut.pixelMatrix = __riscv_applyGaussianFilterSeparable<uint8_t>(

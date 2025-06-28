@@ -195,5 +195,10 @@ vector<vector<T>> applyGaussianFilterSeparable(
     }
     return output;
 }
+// Explicit template instantiation for uint8_t and uint16_t
+template std::vector<std::vector<uint8_t>> applyGaussianFilterSeparable<uint8_t>(
+    const std::vector<std::vector<uint8_t>>&, int, double);
 
+template std::vector<std::vector<uint16_t>> applyGaussianFilterSeparable<uint16_t>(
+    const std::vector<std::vector<uint16_t>>&, int, double);
 #endif
