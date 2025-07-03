@@ -110,7 +110,7 @@ std::vector<std::vector<T>> __riscv_applyGaussianFilterSeparable(
                     vwide = __riscv_vmul_vx_u32m2(vwide, kernel_fixed[k], vl);
                 }
                 
-                vsum = VectorTraits<T>::vadd_vv(vsum, vwide, vl);
+                vsum = VectorTraits<T>::vadd_vv_wide(vsum, vwide, vl);
             }
 
             // Divide by scale factor, narrow, store
@@ -146,7 +146,7 @@ std::vector<std::vector<T>> __riscv_applyGaussianFilterSeparable(
                     vwide = __riscv_vmul_vx_u32m2(vwide, kernel_fixed[k], vl);
                 }
                 
-                vsum = VectorTraits<T>::vadd_vv(vsum, vwide, vl);
+                vsum = VectorTraits<T>::vadd_vv_wide(vsum, vwide, vl);
             }
 
             // Divide by scale factor, narrow, store

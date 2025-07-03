@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <riscv_vector.h>
 #include "Image.hpp"
+#include "VectorTraits.hpp"
 #include <vector>
 using namespace std;
 
@@ -23,12 +24,11 @@ class ImageFlipper_V
 {
 
 public:
-    static void __riscv_flip(Image<T> &image, const FlippingDirection_V direction);
+    void flip(Image<T> &image, const FlippingDirection_V direction);
 
 private:
-    static void __riscv_flipVertical(vector<vector<T>> &matrix);
-    static void __riscv_flipHorizontal(vector<vector<T>> &matrix);
-    static vuint8m1_t create_reverse_index(size_t vl);
+    void flipVertical(vector<vector<T>> &matrix);
+    void flipHorizontal(vector<vector<T>> &matrix);
 };
 
-#endif // FLIPPING_HPP
+#endif // FLIPPINGV_HPP

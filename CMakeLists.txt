@@ -31,18 +31,28 @@ add_subdirectory(utils)
 add_subdirectory(lib) 
 ##################################################
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--as-needed")
-# Add the cpp file that would run the test here
-add_executable(BoxFilterComparison examples/BoxFilterComparison.cpp)
-add_executable(GaussianComparison examples/GaussianComparison.cpp)
-add_executable(RotateFlipComparison examples/Rotate&FlipComparison.cpp)
-add_executable(AddComparison examples/AddComparison.cpp)
+# Add the benchmark executables (following consistent *Benchmark.cpp naming convention)
+add_executable(BoxFilterBenchmark examples/BoxFilterBenchmark.cpp)
+add_executable(GaussianBenchmark examples/GaussianBenchmark.cpp)
+add_executable(RotateAndFlipBenchmark examples/RotateAndFlipBenchmark.cpp)
+add_executable(AddBenchmark examples/AddBenchmark.cpp)
+
+# Individual operation benchmark executables
+add_executable(FlippingBenchmark examples/FlippingBenchmark.cpp)
+add_executable(RotationBenchmark examples/RotationBenchmark.cpp)
+add_executable(AddWeightedBenchmark examples/AddWeightedBenchmark.cpp)
 
 ##################################################
 
-target_link_libraries(BoxFilterComparison PUBLIC tests models UtilsLib lib)
-target_link_libraries(GaussianComparison PUBLIC tests models UtilsLib lib)
-target_link_libraries(RotateFlipComparison PUBLIC tests models UtilsLib lib)
-target_link_libraries(AddComparison PUBLIC tests models UtilsLib lib)
+target_link_libraries(BoxFilterBenchmark PUBLIC tests models UtilsLib lib)
+target_link_libraries(GaussianBenchmark PUBLIC tests models UtilsLib lib)
+target_link_libraries(RotateAndFlipBenchmark PUBLIC tests models UtilsLib lib)
+target_link_libraries(AddBenchmark PUBLIC tests models UtilsLib lib)
+
+# Link individual operation benchmark executables
+target_link_libraries(FlippingBenchmark PUBLIC tests models UtilsLib lib)
+target_link_libraries(RotationBenchmark PUBLIC tests models UtilsLib lib)
+target_link_libraries(AddWeightedBenchmark PUBLIC tests models UtilsLib lib)
 
 ##################################################
 

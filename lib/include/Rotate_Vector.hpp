@@ -2,7 +2,7 @@
 #define ROTATION_HPP_V
 
 #include <stdexcept>
-#include <riscv_vector.h>
+#include "VectorTraits.hpp"
 #include "Image.hpp"
 using namespace std;
 
@@ -23,12 +23,12 @@ template <typename T = uint8_t>
 class ImageRotator_V
 {
 public:
-    static void rotate(Image<T> &image, RotationDirection_V direction);
+    void rotate(Image<T> &image, RotationDirection_V direction);
 
 private:
-    static void __riscv_rotate90CW(vector<vector<T>> &matrix);
-    static void __riscv_rotate90CCW(vector<vector<T>> &matrix);
-    static void __riscv_rotate180(vector<vector<T>> &matrix);
+    void __riscv_rotate90CW(vector<vector<T>> &matrix);
+    void __riscv_rotate90CCW(vector<vector<T>> &matrix);
+    void __riscv_rotate180(vector<vector<T>> &matrix);
 };
 
 #endif // ROTATION_HPP

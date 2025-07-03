@@ -73,7 +73,7 @@ for (int i = 0; i < rows; ++i) {
             const T* ptr = &padded[y][j + border + k];
             auto v       = VectorTraits<T>::vle(ptr, vl);
             auto vwide   = VectorTraits<T>::wadd_zero(v, vl);
-            vsum         = VectorTraits<T>::vadd_vv(vsum, vwide, vl);
+            vsum         = VectorTraits<T>::vadd_vv_wide(vsum, vwide, vl);
         }
 
         // divide, narrow, store
@@ -102,7 +102,7 @@ for (int i = 0; i < rows; ++i) {
             const T* ptr = &tempImg[y0 + k][j + border];
             auto v       = VectorTraits<T>::vle(ptr, vl);
             auto vwide   = VectorTraits<T>::wadd_zero(v, vl);
-            vsum         = VectorTraits<T>::vadd_vv(vsum, vwide, vl);
+            vsum         = VectorTraits<T>::vadd_vv_wide(vsum, vwide, vl);
         }
 
         // 4) divide, narrow, store
