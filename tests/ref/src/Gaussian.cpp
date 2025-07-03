@@ -157,7 +157,7 @@ vector<vector<T>> applyGaussianFilterSeparable(
     vector<double> kernel1D = generateGaussianKernel1D(kernelSize, sigma);
 
     // First pass: horizontal convolution.
-    vector<vector<double>> intermediate(height, vector<double>(width, 0.0));
+    vector<vector<double>> intermediate1(height, vector<double>(width, 0.0));
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -171,7 +171,7 @@ vector<vector<T>> applyGaussianFilterSeparable(
                     continue;
                 sum += image[i][col] * kernel1D[k + half];
             }
-            intermediate[i][j] = sum;
+            intermediate1[i][j] = sum;
         }
     }
 
@@ -188,7 +188,7 @@ vector<vector<T>> applyGaussianFilterSeparable(
                 // Zero padding: if the index is out-of-bounds, assume 0.
                 if (row < 0 || row >= height)
                     continue;
-                sum += intermediate[row][j] * kernel1D[k + half];
+                sum += intermediate1[row][j] * kernel1D[k + half];
             }
             output[i][j] = static_cast<T>(sum);
         }

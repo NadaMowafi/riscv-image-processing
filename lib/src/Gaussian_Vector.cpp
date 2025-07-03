@@ -108,7 +108,7 @@ std::vector<std::vector<T>> __riscv_applyGaussianFilterSeparable(
                     vwide = __riscv_vmul_vx_u16m2(vwide, kernel_fixed[k], vl);
                 } else if constexpr (std::is_same_v<T, uint16_t>) {
                     vwide = __riscv_vmul_vx_u32m2(vwide, kernel_fixed[k], vl);
-                }
+            }
                 
                 vsum = VectorTraits<T>::vadd_vv_wide(vsum, vwide, vl);
             }
@@ -144,7 +144,7 @@ std::vector<std::vector<T>> __riscv_applyGaussianFilterSeparable(
                     vwide = __riscv_vmul_vx_u16m2(vwide, kernel_fixed[k], vl);
                 } else if constexpr (std::is_same_v<T, uint16_t>) {
                     vwide = __riscv_vmul_vx_u32m2(vwide, kernel_fixed[k], vl);
-                }
+            }
                 
                 vsum = VectorTraits<T>::vadd_vv_wide(vsum, vwide, vl);
             }

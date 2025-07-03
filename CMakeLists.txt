@@ -34,7 +34,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--as-needed")
 # Add the benchmark executables (following consistent *Benchmark.cpp naming convention)
 add_executable(BoxFilterBenchmark examples/BoxFilterBenchmark.cpp)
 add_executable(GaussianBenchmark examples/GaussianBenchmark.cpp)
-add_executable(RotateAndFlipBenchmark examples/RotateAndFlipBenchmark.cpp)
+
 add_executable(AddBenchmark examples/AddBenchmark.cpp)
 
 # Individual operation benchmark executables
@@ -42,17 +42,35 @@ add_executable(FlippingBenchmark examples/FlippingBenchmark.cpp)
 add_executable(RotationBenchmark examples/RotationBenchmark.cpp)
 add_executable(AddWeightedBenchmark examples/AddWeightedBenchmark.cpp)
 
+# LMUL comparison benchmark executables
+add_executable(LMULBenchmark examples/LMULBenchmark.cpp)
+add_executable(AddBenchmark_LMUL examples/AddBenchmark_LMUL.cpp)
+add_executable(FlippingBenchmark_LMUL examples/FlippingBenchmark_LMUL.cpp)
+add_executable(BoxFilterBenchmark_LMUL examples/BoxFilterBenchmark_LMUL.cpp)
+add_executable(GaussianBenchmark_LMUL examples/GaussianBenchmark_LMUL.cpp)
+add_executable(BoxFilterBenchmark_LMUL_Simple examples/BoxFilterBenchmark_LMUL_Simple.cpp)
+add_executable(RegisterPressureStressTest examples/RegisterPressureStressTest.cpp)
+
 ##################################################
 
 target_link_libraries(BoxFilterBenchmark PUBLIC tests models UtilsLib lib)
 target_link_libraries(GaussianBenchmark PUBLIC tests models UtilsLib lib)
-target_link_libraries(RotateAndFlipBenchmark PUBLIC tests models UtilsLib lib)
+
 target_link_libraries(AddBenchmark PUBLIC tests models UtilsLib lib)
 
 # Link individual operation benchmark executables
 target_link_libraries(FlippingBenchmark PUBLIC tests models UtilsLib lib)
 target_link_libraries(RotationBenchmark PUBLIC tests models UtilsLib lib)
 target_link_libraries(AddWeightedBenchmark PUBLIC tests models UtilsLib lib)
+
+# Link LMUL comparison benchmark executables
+target_link_libraries(LMULBenchmark PUBLIC tests models UtilsLib lib)
+target_link_libraries(AddBenchmark_LMUL PUBLIC tests models UtilsLib lib)
+target_link_libraries(FlippingBenchmark_LMUL PUBLIC tests models UtilsLib lib)
+target_link_libraries(BoxFilterBenchmark_LMUL PUBLIC tests models UtilsLib lib)
+target_link_libraries(GaussianBenchmark_LMUL PUBLIC tests models UtilsLib lib)
+target_link_libraries(BoxFilterBenchmark_LMUL_Simple PUBLIC tests models UtilsLib lib)
+target_link_libraries(RegisterPressureStressTest PUBLIC tests models UtilsLib lib)
 
 ##################################################
 

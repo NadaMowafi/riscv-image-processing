@@ -18,7 +18,7 @@ struct VectorTraits<uint8_t> {
     using mask_type = vbool8_t;
 
     // ========== BASIC VECTOR OPERATIONS ==========
-    
+
     static size_t vsetvl(size_t avl) {
         return __riscv_vsetvl_e8m1(avl);
     }
@@ -332,7 +332,7 @@ struct VectorTraits<uint16_t> {
     using mask_type = vbool16_t;
 
     // ========== BASIC VECTOR OPERATIONS ==========
-    
+
     static size_t vsetvl(size_t avl) {
         return __riscv_vsetvl_e16m1(avl);
     }
